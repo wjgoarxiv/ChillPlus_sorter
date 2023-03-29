@@ -1,0 +1,2 @@
+# "ChillPlus.counts.HYDRATE" "Frame" "ChillPlus.counts.HEXAGONAL_ICE" "ChillPlus.counts.INTERFACIAL_HYDRATE" "ChillPlus.counts.INTERFACIAL_ICE"
+4096 264 134400 1162 3601 
