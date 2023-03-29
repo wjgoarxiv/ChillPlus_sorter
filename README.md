@@ -38,3 +38,13 @@ This code snippets can help you to gather all the CHILL+ data that are separated
     ```
     python3 ./src/2_plotgraph.py -h
     ```
+
+## **LICENSE**
+This code is licensed under the MIT License. 
+
+## **Author**
+- [wjgoarxiv](https://github.com/wjgoarxiv)
+
+## **Acknowledgement**
+- [OVITO](https://www.ovito.org/)
+- [CHILL+](https://www.ovito.org/docs/current/reference/pipelines/modifiers/chill_plus.html#chill)
