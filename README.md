@@ -3,6 +3,9 @@
 ## **What is this?**
 This code snippets can help you to gather all the CHILL+ data that are separated into each frame files into one single file. If you are OVITO and CHILL+ plugin user, this code can help you to easily treat the data and plot the graph. 
 
+## **Gallery**
+<img src = "https://github.com/wjgoarxiv/ChillPlus_sorter/blob/eeee2ad5cd41a69651b2bd9a3647ff9ec417f611/GALLERY/testoutput.png" style="width: 600px; height:auto;">
+
 ## **How to use?**
 1. Download this repository into your local machine. And then get into the folder.
     ```
@@ -35,6 +38,3 @@ This code snippets can help you to gather all the CHILL+ data that are separated
     ```
     python3 ./src/2_plotgraph.py -h
     ```
-
-## **Gallery**
-<img src = "https://github.com/wjgoarxiv/ChillPlus_sorter/blob/eeee2ad5cd41a69651b2bd9a3647ff9ec417f611/GALLERY/testoutput.png" style="width: 600px; height:auto;">
