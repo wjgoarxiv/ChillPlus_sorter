@@ -112,7 +112,7 @@ def plot_graph(x, y, ax, color, label):
     ax.tick_params(axis='y', which='minor', colors=color)
 
     # Set the x limit
-    ax.set_xlim(0, 100)
+    ax.set_xlim(0, )
 
 def main():
     args = parser.parse_args()
@@ -181,12 +181,6 @@ def main():
 
     axes[1, 1].tick_params(axis='x', which='minor', colors='tab:green')
     axes[1, 1].tick_params(axis='y', which='minor', colors='tab:green')
-
-    # Set the x limit
-    axes[0, 0].set_xlim(0, 100)
-    axes[0, 1].set_xlim(0, 100)
-    axes[1, 0].set_xlim(0, 100)
-    axes[1, 1].set_xlim(0, 100)
 
     # Set legend
     axes[0, 0].legend(loc='upper right')
