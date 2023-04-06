@@ -119,7 +119,7 @@ def main():
     input_file = args.input 
     data = read_data(input_file)
     data = add_time_column(data)
-    data = reset_time_to_zero(data)
+    # data = reset_time_to_zero(data) # Turn this function only when you have to re-adjust the x data.
     set_rcparams()
 
     # `Frame` is the x data.
