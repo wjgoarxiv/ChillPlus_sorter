@@ -1,4 +1,4 @@
-import pandas as pd
+import pandas as pd 
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import rcParams
@@ -7,32 +7,21 @@ import argparse
 # Parse the arguments
 parser = argparse.ArgumentParser()
 parser.add_argument('-i', '--input', type=str, help='The name of the file to be imported')
-parser.add_argument('-o', '--output', type=str, help='The name of the output png file')
+parser.add_argument('-o', '--output', type=str, help='The name of the `png` file')
+
 args = parser.parse_args()
 
 def read_data(file_name):
-    # Read the data from the CSV file
+    # Read the data
     data = pd.read_csv(file_name)
     return data
 
 def add_time_column(data):
-    # Add a column for the time in ns. Note that it is the column that divided the `frame` column by 10
-    data['time'] = data['Frame']/10
-    return data
+    # Ask user the time interval
+    t_interval = float(input("INFO: Enter the time interval of the exported trajectory (in ns): "))
 
-def reset_time_to_zero(data):
-    # In this code block, we will find the time when the hydrate count is maximum. And then, reset the time to zero at that point.
-    # Find the maximum hydrate count
-    max_hydrate_count = data['ChillPlus.counts.HYDRATE'].max()
-
-    # Find the time when the hydrate count is maximum
-    max_hydrate_time = data.loc[data['ChillPlus.counts.HYDRATE'] == max_hydrate_count, 'time'].iloc[0]
-
-    # Reset the time to zero at the point when the hydrate count is maximum
-    data['time'] = data['time'] - max_hydrate_time
-
-    # Delete the rows if time < 0
-    data = data[data['time'] >= 0]
+    # Add a new column called 'Time' to the dataframe
+    data['time'] = data['Frame'] * t_interval
     return data
 
 def set_rcparams():
@@ -76,11 +65,11 @@ def set_rcparams():
 
     rcParams['font.size'] = 14
     rcParams['axes.titlepad'] = 10
-    rcParams['axes.titleweight'] = 'bold'
+    rcParams['axes.titleweight'] = 'normal'
     rcParams['axes.titlesize'] = 18
 
     # Axes settings
-    rcParams['axes.labelweight'] = 'bold'
+    rcParams['axes.labelweight'] = 'normal'
     rcParams['xtick.labelsize'] = 12
     rcParams['ytick.labelsize'] = 12
     rcParams['axes.labelsize'] = 16
@@ -93,103 +82,67 @@ def set_rcparams():
     rcParams['legend.title_fontsize'] = 12
     rcParams['legend.frameon'] = True
 
-def plot_graph(x, y, ax, color, label):
-    # Plot the data
-    ax.plot(x, y, label=label, color=color)
+def plot_and_save(data, output_prefix):
+    # Drop the `Frame` column
+    data = data.drop(columns=['Frame'])
+    color_list = ['black', 'tab:blue', 'tab:orange', 'tab:green', 'tab:red', 'tab:purple', 'tab:brown']
 
-    # Set the frame color
-    ax.spines['bottom'].set_color(color)
-    ax.spines['top'].set_color(color)
-    ax.spines['left'].set_color(color)
-    ax.spines['right'].set_color(color)
+    for column in data.columns:
+        if column == 'time':
+            continue # Skip the `time` to avoid plotting it  
+        elif column == '#':
+            continue
 
-    # Tick color changing
-    ax.tick_params(axis='x', colors=color)
-    ax.tick_params(axis='y', colors=color)
+        plt.figure(figsize=(4, 3))
 
-    # Minor tick color changing
-    ax.tick_params(axis='x', which='minor', colors=color)
-    ax.tick_params(axis='y', which='minor', colors=color)
+        # change the color of the graph by looping through the color_list
+        plt.plot(data['time'], data[column], label=column, color=color_list[data.columns.get_loc(column)])
+        plt.xlabel('Time (ns)', color = color_list[data.columns.get_loc(column)])
 
-    # Set the x limit
-    ax.set_xlim(0, )
+        # Set the y-axis label
+        if column=="ChillPlus.counts.HYDRATE":
+            plt.ylabel("Hydrate counts", color = color_list[data.columns.get_loc(column)])
+        elif column=="ChillPlus.counts.HEXAGONAL_ICE":
+            plt.ylabel("Hexagonal ice counts", color = color_list[data.columns.get_loc(column)])
+        elif column=="ChillPlus.counts.CUBIC_ICE":
+            plt.ylabel("Cubic ice counts", color = color_list[data.columns.get_loc(column)])
+        elif column=="ChillPlus.counts.INTERFACIAL_HYDRATE":
+            plt.ylabel("Interfacial hydrate counts", color = color_list[data.columns.get_loc(column)])
+        elif column=="ChillPlus.counts.INTERFACIAL_ICE":
+            plt.ylabel("Interfacial ice counts", color = color_list[data.columns.get_loc(column)])
+        elif column=="ChillPlus.counts.OTHERS":
+            plt.ylabel("Others", color = color_list[data.columns.get_loc(column)])
+        else:
+            pass
 
-def main():
-    args = parser.parse_args()
-    input_file = args.input 
-    data = read_data(input_file)
-    data = add_time_column(data)
-    # data = reset_time_to_zero(data) # Turn this function on only when you have to re-adjust the x data.
-    set_rcparams()
+        # xlim
+        plt.xlim(0, data['time'].max())
 
-    # `Frame` is the x data.
-    # y1 = `ChillPlus.counts.HYDRATE`
-    # y2 = `ChillPlus.counts.HEXAGONAL_ICE`
-    # y3 = `ChillPlus.counts.INTERFACIAL_HYDRATE`
-    # y4 = `ChillPlus.counts.INTERFACIAL_ICE`
+        # Ticks
+        plt.tick_params(axis='x', colors=color_list[data.columns.get_loc(column)])
+        plt.tick_params(axis='y', colors=color_list[data.columns.get_loc(column)])
+        plt.tick_params(axis='x', which='minor', colors=color_list[data.columns.get_loc(column)])
+        plt.tick_params(axis='y', which='minor', colors=color_list[data.columns.get_loc(column)])
 
-    # And all the other columns are y data.
-    # Let's plot them in each subplots.
+        # Color spines
+        ax = plt.gca()
+        for spine in ax.spines.values():
+            spine.set_edgecolor(color_list[data.columns.get_loc(column)])
 
-    fig, axes = plt.subplots(2, 2, figsize=(10, 8))
+        plt.tight_layout()
+        plt.savefig(f'{output_prefix}_{column}.png', dpi=300, bbox_inches='tight')
+        plt.close()
 
-    plot_graph(data['time'], data['ChillPlus.counts.HYDRATE'], axes[0, 0], 'tab:orange', '$N_{Hydrate}$')
-    plot_graph(data['time'], data['ChillPlus.counts.HEXAGONAL_ICE'], axes[0, 1], 'tab:blue', 'HEXAGONAL_ICE')
-    plot_graph(data['time'], data['ChillPlus.counts.INTERFACIAL_HYDRATE'], axes[1, 0], 'tab:purple', 'INTERFACIAL_HYDRATE')
-    plot_graph(data['time'], data['ChillPlus.counts.INTERFACIAL_ICE'], axes[1, 1], 'tab:green', 'INTERFACIAL_ICE')
-
-    # Set the title
-    axes[0, 0].set_title('Hydrates', color = 'tab:orange')
-    axes[0, 1].set_title('Hexagonal ices', color = 'tab:blue')
-    axes[1, 0].set_title('Interfacial hydrates', color = 'tab:purple')
-    axes[1, 1].set_title('Interfacial ices', color = 'tab:green')
-
-    # Set the x label
-    axes[0, 0].set_xlabel('Time (ns)', color = 'tab:orange')
-    axes[0, 1].set_xlabel('Time (ns)', color = 'tab:blue')
-    axes[1, 0].set_xlabel('Time (ns)', color = 'tab:purple')
-    axes[1, 1].set_xlabel('Time (ns)', color = 'tab:green')
-
-    # Set the y label
-    axes[0, 0].set_ylabel('Counts', color = 'tab:orange', labelpad=12)
-    axes[0, 1].set_ylabel('Counts', color = 'tab:blue')
-    axes[1, 0].set_ylabel('Counts', color = 'tab:purple')
-    axes[1, 1].set_ylabel('Counts', color = 'tab:green')
-
-    # Tick color changing
-    axes[0, 0].tick_params(axis='x', colors='tab:orange')
-    axes[0, 0].tick_params(axis='y', colors='tab:orange')
-
-    axes[0, 1].tick_params(axis='x', colors='tab:blue')
-    axes[0, 1].tick_params(axis='y', colors='tab:blue')
-
-    axes[1, 0].tick_params(axis='x', colors='tab:purple')
-    axes[1, 0].tick_params(axis='y', colors='tab:purple')
-
-    axes[1, 1].tick_params(axis='x', colors='tab:green')
-    axes[1, 1].tick_params(axis='y', colors='tab:green')
-
-    # Minor tick color changing
-    axes[0, 0].tick_params(axis='x', which='minor', colors='tab:orange')
-    axes[0, 0].tick_params(axis='y', which='minor', colors='tab:orange')
-
-    axes[0, 1].tick_params(axis='x', which='minor', colors='tab:blue')
-    axes[0, 1].tick_params(axis='y', which='minor', colors='tab:blue')
-
-    axes[1, 0].tick_params(axis='x', which='minor', colors='tab:purple')
-    axes[1, 0].tick_params(axis='y', which='minor', colors='tab:purple')
-
-    axes[1, 1].tick_params(axis='x', which='minor', colors='tab:green')
-    axes[1, 1].tick_params(axis='y', which='minor', colors='tab:green')
-
-    # Set legend
-    axes[0, 0].legend(loc='upper right')
-    axes[0, 1].legend(loc='upper right')
-    axes[1, 0].legend(loc='upper right')
-    axes[1, 1].legend(loc='upper right')
-
-    plt.tight_layout()
-    plt.savefig(args.output, dpi=300)
+        print(f"INFO: `{column}` has been plotted and saved.")
 
 if __name__ == '__main__':
-  main()
+    input_file = args.input
+    output_prefix = args.output
+
+    # Read and process data
+    data = read_data(input_file)
+    data = add_time_column(data)
+    set_rcparams()
+
+    # Plot and save graphs
+    plot_and_save(data, output_prefix)
