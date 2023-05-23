@@ -19,7 +19,7 @@ data = []
 
 # Get the sorted list of filenames as integers
 sorted_filenames = sorted(
-    (int(f[:-4]) for f in os.listdir(chillplus_dir) if f.endswith(".txt"))
+    (int(f[:-4]) for f in os.listdir(chillplus_dir) if f.endswith(".txt") and not f.startswith("._"))
 )
 
 # Loop through the sorted filenames
